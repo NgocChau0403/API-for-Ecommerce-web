@@ -2,7 +2,6 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const dbConnect = require("./config/dbConnect");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
-const app = express();
 const dotenv = require("dotenv").config();
 const PORT = process.env.PORT || 4000;
 const authRouter = require("./routes/authRoute");
@@ -14,7 +13,16 @@ const brandRouter = require("./routes/brandRoute");
 const couponRouter = require("./routes/couponRoute");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
+const cors = require("cors");
+const app = express();
 dbConnect();
+
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
 
 app.use(morgan("dev"));
 app.use(bodyParser.json());
@@ -31,6 +39,23 @@ app.use("/api/coupon", couponRouter);
 
 app.use(notFound);
 app.use(errorHandler);
+
+// Cấu hình CORS
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Cho phép frontend từ localhost:3000
+    methods: ["GET", "POST"], // Đảm bảo các phương thức này được hỗ trợ
+    allowedHeaders: ["Content-Type"], // Các header được phép
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+  })
+);
+
+// Các route của API
+app.get("/api/products", (req, res) => {
+  res.json({ message: "Hello from backend" });
+  console.log(`haha`);
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running at PORT ${PORT}`);

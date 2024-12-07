@@ -17,11 +17,48 @@ const cloudinaryUploadImg = async (filePath, folder) => {
         } else if (!result || !result.secure_url) {
           reject(new Error("Invalid response from Cloudinary"));
         } else {
-          resolve(result.secure_url);
+          resolve(
+            {
+              url: result.secure_url,
+              asset_id: result.asset_id,
+              public_id: result.public_id,
+            },
+            {
+              resource_type: "auto",
+            }
+          );
         }
       }
     );
   });
 };
 
-module.exports = cloudinaryUploadImg;
+const cloudinaryDeleteImg = async (filePath, folder) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(
+      filePath,
+      { folder: folder },
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          reject(error);
+        } else if (!result || !result.secure_url) {
+          reject(new Error("Invalid response from Cloudinary"));
+        } else {
+          resolve(
+            {
+              url: result.secure_url,
+              asset_id: result.asset_id,
+              public_id: result.public_id,
+            },
+            {
+              resource_type: "auto",
+            }
+          );
+        }
+      }
+    );
+  });
+};
+
+module.exports = { cloudinaryUploadImg, cloudinaryDeleteImg };
